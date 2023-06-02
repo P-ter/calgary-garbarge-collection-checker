@@ -88,6 +88,7 @@ export default function Home() {
             Calgary.
           </p>
         </div>
+        {/* @ts-expect-error Server Component */}
         <GarbageCollectionBox />
       </div>
     </main>

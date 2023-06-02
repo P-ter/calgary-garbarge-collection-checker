@@ -84,7 +84,7 @@ export const GarbageCollectionDetails: React.FC<Props> = ({
         setSchedules(schedules);
       });
     });
-  }, []);
+  }, [getCurrentSchedule]);
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center w-3/4 bg-white rounded-lg shadow-lg">
