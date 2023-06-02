@@ -23,16 +23,18 @@ function getDateOfThisWeek(dayToCheck:Date, dayOfWeek: number): Date {
 function getDistanceInNatualLanguage(baseDate: Date, toDate: Date): string {
   const distanceInDays = differenceInCalendarDays(toDate, baseDate);
   const formattedToDate = format(toDate, "EEEE, MMMM do");
+  const distanceInWeeks = differenceInCalendarWeeks(toDate, baseDate);
+  const isThisWeek = distanceInWeeks === 0;
   if(distanceInDays === 0) {
     return "Today";
   } else if(distanceInDays === 1) {
     return "Tomorrow";
-  } else if(distanceInDays < 7) {
+  } else if(isThisWeek) {
     return `In ${distanceInDays} days, on ${formattedToDate}`;
-  } else if(distanceInDays < 14) {
+  } else if(distanceInWeeks === 1) {
     return `Next week, on ${formattedToDate}`;
   } else {
-    return `In ${differenceInWeeks(toDate, baseDate)} weeks, on ${formattedToDate}`;
+    return `In ${differenceInCalendarWeeks(toDate, baseDate)} weeks, on ${formattedToDate}`;
   }
 }
 
@@ -80,14 +82,13 @@ export const GarbageCollectionDetails: React.FC<Props> = ({
         position.coords.latitude,
         position.coords.longitude
       ).then((schedules) => {
-        console.log(schedules);
         setSchedules(schedules);
       });
     });
   }, [getCurrentSchedule]);
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center w-3/4 bg-white rounded-lg shadow-lg">
+    <div className="flex flex-col flex-1 items-center justify-center w-full bg-white rounded-lg shadow-lg">
       {schedules.map((schedule) => {
         return <GarbageSchedule key={schedule.type} schedule={schedule} />;
       })}

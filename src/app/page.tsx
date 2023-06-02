@@ -1,9 +1,7 @@
 import Image from "next/image";
 import { GarbageCollectionDetails } from "./GarbageCollectionDetails";
 import { z } from "zod";
-
-
-
+import { parse } from "path";
 
 const ScheduleSchema = z.object({
   commodity: z.enum(["Black", "Blue", "Green"]),
@@ -42,6 +40,27 @@ function processSchedules(data: ScheduleInput[]): Schedule[] {
   return schedules;
 }
 
+function parseCollectionDayToNumber(collectionDay: string): number {
+  switch (collectionDay) {
+    case "Sunday":
+      return 0;
+    case "Monday":
+      return 1;
+    case "Tuesday":
+      return 2;
+    case "Wednesday":
+      return 3;
+    case "Thursday":
+      return 4;
+    case "Friday":
+      return 5;
+    case "Saturday":
+      return 6;
+    default:
+      throw new Error("Invalid collection day");
+  }
+}
+
 function processSchedule(schedule: ScheduleInput): Schedule {
   const currentSeason = schedule.current_season;
   let collectionFrequency = schedule.clect_int_winter;
@@ -54,7 +73,7 @@ function processSchedule(schedule: ScheduleInput): Schedule {
     collectionFrequency: collectionFrequency,
     collectionDay: collectionDay,
     type: schedule.commodity,
-    collectionDayCode: schedule.clect_day_code,
+    collectionDayCode: parseCollectionDayToNumber(collectionDay),
   } as Schedule;
 }
 
