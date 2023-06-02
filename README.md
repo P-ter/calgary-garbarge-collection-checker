@@ -1,6 +1,6 @@
 # Introduction
 
-This is a simple for fun project with the main purpose was to learn about this new exciting React Server Component and Server Actions. I am happy to report that developer's experience wise, it felt incredible. However, this was just a simple project I wanted to set up to learn both React 18, Nextjs 13 and Typescript at the same time. I may potentially start adding more functionality to this, but I think for me, it has fulfilled its purpose.
+This is a simple for fun project with the main purpose was to learn about this new exciting React Server Component and Server Actions. I am happy to report that developer's experience wise, it felt incredible. However, this was just a simple project I wanted to set up to learn both React 18, Nextjs 13 and Typescript at the same time. I may potentially start adding more functionality to this, but I think for me, it has fulfilled its purpose. Thank you
 
 ## Getting Started
 
