@@ -110,10 +110,10 @@ const GarbageSchedule: React.FC<{ schedule: Schedule }> = ({ schedule }) => {
 
   return (
     <div className="flex-1 flex w-full">
-      <div className="flex-0 flex flex-col justify-center">
+      <div className="flex-0 flex flex-col justify-center pl-10 pr-10">
         <Image src={imgSrc} alt={schedule.type} width={100} height={200} />
       </div>
-      <div className="flex-1 text-neutral-950 flex flex-col justify-center"><p className="text-center">{getNextCollectionDate(today, schedule.collectionDayCode, schedule.collectionDay, schedule.collectionFrequency)}</p></div>
+      <div className="flex-1 text-neutral-950 flex flex-col justify-center pr-5"><p className="text-center">{getNextCollectionDate(today, schedule.collectionDayCode, schedule.collectionDay, schedule.collectionFrequency)}</p></div>
     </div>
   );
 };
