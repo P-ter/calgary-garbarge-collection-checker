@@ -110,18 +110,21 @@ export const GarbageCollectionDetails: React.FC<Props> = ({
 }) => {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
 
-  navigator.geolocation.getCurrentPosition(
-    function (position) {
-      getCurrentSchedule(
-        position.coords.latitude,
-        position.coords.longitude
-      ).then((schedules) => {
-        setSchedules(schedules);
-      });
-    },
-    console.error,
-    { enableHighAccuracy: true }
-  );
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      function (position) {
+        getCurrentSchedule(
+          position.coords.latitude,
+          position.coords.longitude
+        ).then((schedules) => {
+          setSchedules(schedules);
+        });
+      },
+      console.error,
+      { enableHighAccuracy: true }
+    );
+  }, []);
+
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center w-full bg-white rounded-lg shadow-lg">
@@ -162,3 +165,10 @@ const GarbageSchedule: React.FC<{ schedule: Schedule }> = ({ schedule }) => {
     </div>
   );
 };
+
+
+const GarbageCollectionNotficationButton: React.FC = () => {
+  return (
+    <button>Notify me</button>
+  );
+}
