@@ -81,7 +81,7 @@ async function GarbageCollectionBox() {
   async function getCurrentSchedule(lat: number, long: number): Promise<Schedule[]> {
     "use server";
     const response = await fetch(
-      `https://data.calgary.ca/resource/jq4t-b745.json?$where=within_circle(point, ${lat}, ${long}, 50)&$$app_token=${env.CALGARY_DATA_APP_TOKEN}`
+      `https://data.calgary.ca/resource/jq4t-b745.json?$where=within_circle(point, ${lat}, ${long}, 100)&$$app_token=${env.CALGARY_DATA_APP_TOKEN}`
     );
     const data = await response.json();
     const parsedData = responseSchema.parse(data);
