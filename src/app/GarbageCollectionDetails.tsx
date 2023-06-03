@@ -4,7 +4,17 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { CollectionFrequency, Schedule } from "./page";
 import Image from "next/image";
-import { parse, differenceInCalendarWeeks, getDay, startOfWeek, addDays, differenceInCalendarDays, format, differenceInWeeks, addWeeks } from "date-fns";
+import {
+  parse,
+  differenceInCalendarWeeks,
+  getDay,
+  startOfWeek,
+  addDays,
+  differenceInCalendarDays,
+  format,
+  differenceInWeeks,
+  addWeeks,
+} from "date-fns";
 type Props = {
   getCurrentSchedule: (lat: number, long: number) => Promise<Schedule[]>;
 };
@@ -15,7 +25,7 @@ function isOdd(num: number): boolean {
   return num % 2 === 1;
 }
 
-function getDateOfThisWeek(dayToCheck:Date, dayOfWeek: number): Date {
+function getDateOfThisWeek(dayToCheck: Date, dayOfWeek: number): Date {
   const startOfWeekDate = startOfWeek(dayToCheck);
   return addDays(startOfWeekDate, dayOfWeek);
 }
@@ -25,67 +35,93 @@ function getDistanceInNatualLanguage(baseDate: Date, toDate: Date): string {
   const formattedToDate = format(toDate, "EEEE, MMMM do");
   const distanceInWeeks = differenceInCalendarWeeks(toDate, baseDate);
   const isThisWeek = distanceInWeeks === 0;
-  if(distanceInDays === 0) {
+  if (distanceInDays === 0) {
     return "Today";
-  } else if(distanceInDays === 1) {
+  } else if (distanceInDays === 1) {
     return "Tomorrow";
-  } else if(isThisWeek) {
+  } else if (isThisWeek) {
     return `In ${distanceInDays} days, on ${formattedToDate}`;
-  } else if(distanceInWeeks === 1) {
+  } else if (distanceInWeeks === 1) {
     return `Next week, on ${formattedToDate}`;
   } else {
-    return `In ${differenceInCalendarWeeks(toDate, baseDate)} weeks, on ${formattedToDate}`;
+    return `In ${differenceInCalendarWeeks(
+      toDate,
+      baseDate
+    )} weeks, on ${formattedToDate}`;
   }
 }
 
 /**
  * Can I engineer this into a more complex and abstract solution? yes. but I have grown to appreciate the simplicity of a changable and readable codebase.
  */
-function getNextCollectionDate(dayToCheck: Date,collectionDayCode:number, collectionDay: string, collectionFrequency: CollectionFrequency): string {
+function getNextCollectionDate(
+  dayToCheck: Date,
+  collectionDayCode: number,
+  collectionDay: string,
+  collectionFrequency: CollectionFrequency
+): string {
   const diffInWeeks = differenceInCalendarWeeks(dayToCheck, BASE_DATE);
   const currentDayOfWeek = dayToCheck.getDay();
-  const dateOfThisWeekForCollectionDayCode = getDateOfThisWeek(dayToCheck, collectionDayCode);
+  const dateOfThisWeekForCollectionDayCode = getDateOfThisWeek(
+    dayToCheck,
+    collectionDayCode
+  );
   const collectEveryWeek = collectionFrequency === "EVERY";
   const collectOnOddWeeks = collectionFrequency === "ODD";
   const collectOnEvenWeeks = collectionFrequency === "EVEN";
   const isOddWeek = isOdd(diffInWeeks);
   const isEvenWeek = !isOddWeek;
-  const thisWeekMatchCollectionFrequency = collectEveryWeek || (collectOnOddWeeks && isOddWeek) || (collectOnEvenWeeks && isEvenWeek);
+  const thisWeekMatchCollectionFrequency =
+    collectEveryWeek ||
+    (collectOnOddWeeks && isOddWeek) ||
+    (collectOnEvenWeeks && isEvenWeek);
   let weeksTillNextCollection = 1;
-  if(thisWeekMatchCollectionFrequency && (collectOnOddWeeks || collectOnEvenWeeks) ) {
+  if (
+    thisWeekMatchCollectionFrequency &&
+    (collectOnOddWeeks || collectOnEvenWeeks)
+  ) {
     weeksTillNextCollection = 2;
   }
-  const nextCollectionDate = addWeeks(dateOfThisWeekForCollectionDayCode, weeksTillNextCollection);
-  if(thisWeekMatchCollectionFrequency) {
-    if(currentDayOfWeek === collectionDayCode) {
-      return `Today. Next collection will be: ${getDistanceInNatualLanguage(dayToCheck, nextCollectionDate)}`;
-    } else if(currentDayOfWeek < collectionDayCode) {
-      return getDistanceInNatualLanguage(dayToCheck, dateOfThisWeekForCollectionDayCode);
+  const nextCollectionDate = addWeeks(
+    dateOfThisWeekForCollectionDayCode,
+    weeksTillNextCollection
+  );
+  if (thisWeekMatchCollectionFrequency) {
+    if (currentDayOfWeek === collectionDayCode) {
+      return `Today. Next collection will be: ${getDistanceInNatualLanguage(
+        dayToCheck,
+        nextCollectionDate
+      )}`;
+    } else if (currentDayOfWeek < collectionDayCode) {
+      return getDistanceInNatualLanguage(
+        dayToCheck,
+        dateOfThisWeekForCollectionDayCode
+      );
     } else {
       return getDistanceInNatualLanguage(dayToCheck, nextCollectionDate);
     }
   } else {
     return getDistanceInNatualLanguage(dayToCheck, nextCollectionDate);
-  } 
+  }
 }
-
-
 
 export const GarbageCollectionDetails: React.FC<Props> = ({
   getCurrentSchedule,
 }) => {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
 
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(function (position) {
+  navigator.geolocation.getCurrentPosition(
+    function (position) {
       getCurrentSchedule(
         position.coords.latitude,
         position.coords.longitude
       ).then((schedules) => {
         setSchedules(schedules);
       });
-    });
-  }, [getCurrentSchedule]);
+    },
+    console.error,
+    { enableHighAccuracy: true }
+  );
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center w-full bg-white rounded-lg shadow-lg">
@@ -110,10 +146,19 @@ const GarbageSchedule: React.FC<{ schedule: Schedule }> = ({ schedule }) => {
 
   return (
     <div className="flex-1 flex w-full">
-      <div className="flex-0 flex flex-col justify-center pl-10 pr-10">
+      <div className="flex-0 flex flex-col justify-center pl-5 pr-10">
         <Image src={imgSrc} alt={schedule.type} width={100} height={200} />
       </div>
-      <div className="flex-1 text-neutral-950 flex flex-col justify-center pr-5"><p className="text-center">{getNextCollectionDate(today, schedule.collectionDayCode, schedule.collectionDay, schedule.collectionFrequency)}</p></div>
+      <div className="flex-1 text-neutral-950 flex flex-col justify-center pr-5">
+        <p className="text-center">
+          {getNextCollectionDate(
+            today,
+            schedule.collectionDayCode,
+            schedule.collectionDay,
+            schedule.collectionFrequency
+          )}
+        </p>
+      </div>
     </div>
   );
 };

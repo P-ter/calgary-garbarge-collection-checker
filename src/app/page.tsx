@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { GarbageCollectionDetails } from "./GarbageCollectionDetails";
 import { z } from "zod";
-import {env} from "../env";
+import { env } from "../env";
+import _, { find } from "lodash";
 
 const ScheduleSchema = z.object({
   commodity: z.enum(["Black", "Blue", "Green"]),
@@ -23,12 +24,25 @@ export type Schedule = {
   collectionDay: string;
   collectionDayCode: number;
   type: "Blue" | "Green" | "Black";
+};
+
+function findMostCommonScheduleInRange(schedules: ScheduleInput[]): ScheduleInput {
+  const groupedByCollectionDayCode = _.groupBy(schedules, (schedule) => schedule.clect_day_code);
+  const mostCommonCollectionDayCode = _.maxBy(Object.keys(groupedByCollectionDayCode), (collectionDayCode) => groupedByCollectionDayCode[collectionDayCode].length);
+  if(!mostCommonCollectionDayCode) {
+    throw new Error("Could not find most common collection day code");
+  }
+  const mostCommonSchedule = groupedByCollectionDayCode[mostCommonCollectionDayCode][0];
+  return mostCommonSchedule;
 }
 
 function processSchedules(data: ScheduleInput[]): Schedule[] {
-  const blackBin = data.find((schedule) => schedule.commodity === "Black");
-  const blueBin = data.find((schedule) => schedule.commodity === "Blue");
-  const greenBin = data.find((schedule) => schedule.commodity === "Green");
+
+  const groupByCommodity = _.groupBy<ScheduleInput>(data, (schedule) => schedule.commodity);
+
+  const blackBin = findMostCommonScheduleInRange(groupByCommodity["Black"]);
+  const blueBin = findMostCommonScheduleInRange(groupByCommodity["Blue"]);
+  const greenBin = findMostCommonScheduleInRange(groupByCommodity["Green"]);
 
   if (!blackBin || !blueBin || !greenBin) {
     throw new Error("Could not find all bins");
@@ -78,20 +92,20 @@ function processSchedule(schedule: ScheduleInput): Schedule {
 }
 
 async function GarbageCollectionBox() {
-  async function getCurrentSchedule(lat: number, long: number): Promise<Schedule[]> {
+  async function getCurrentSchedule(
+    lat: number,
+    long: number
+  ): Promise<Schedule[]> {
     "use server";
     const response = await fetch(
-      `https://data.calgary.ca/resource/jq4t-b745.json?$where=within_circle(point, ${lat}, ${long}, 100)&$$app_token=${env.CALGARY_DATA_APP_TOKEN}`
+      `https://data.calgary.ca/resource/jq4t-b745.json?$where=within_circle(point, ${lat}, ${long}, 300)&$$app_token=${env.CALGARY_DATA_APP_TOKEN}`
     );
     const data = await response.json();
     const parsedData = responseSchema.parse(data);
-
     return processSchedules(parsedData);
   }
 
-  return (
-      <GarbageCollectionDetails getCurrentSchedule={getCurrentSchedule} />
-  );
+  return <GarbageCollectionDetails getCurrentSchedule={getCurrentSchedule} />;
 }
 
 export default function Home() {
