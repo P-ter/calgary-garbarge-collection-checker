@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { GarbageCollectionDetails } from "./GarbageCollectionDetails";
 import { z } from "zod";
-import { parse } from "path";
+import {env} from "../env";
 
 const ScheduleSchema = z.object({
   commodity: z.enum(["Black", "Blue", "Green"]),
@@ -81,7 +81,7 @@ async function GarbageCollectionBox() {
   async function getCurrentSchedule(lat: number, long: number): Promise<Schedule[]> {
     "use server";
     const response = await fetch(
-      `https://data.calgary.ca/resource/jq4t-b745.json?$where=within_circle(point, ${lat}, ${long}, 50)`
+      `https://data.calgary.ca/resource/jq4t-b745.json?$where=within_circle(point, ${lat}, ${long}, 50)&$$app_token=${env.CALGARY_DATA_APP_TOKEN}`
     );
     const data = await response.json();
     const parsedData = responseSchema.parse(data);
